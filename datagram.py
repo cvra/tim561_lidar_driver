@@ -1,9 +1,8 @@
-import socket
-from struct import *
 import collections
+from logging import debug
 
-sick561_datagram = collections.namedtuple("sick561_datagram", ["TypeOfCommand", 
-                                                               "Command", 
+Sick561Datagram = collections.namedtuple("sick561_datagram", ["TypeOfCommand",
+                                                               "Command",
                                                                "VersionNumber",
                                                                "DeviceNumber",
                                                                "SerialNumber",
@@ -27,13 +26,13 @@ sick561_datagram = collections.namedtuple("sick561_datagram", ["TypeOfCommand",
                                                                "StartingAngle",
                                                                "AngularStepWidth",
                                                                "NumberOfData",
-                                                               "Datas",
-                                                               "NumberOf8BitChannels",
-                                                               "Position",
-                                                               "Name",
-                                                               "Comment",
-                                                               "TimeInformation",
-                                                               "EventInformation"])
+                                                               "Data"])
+                                                               # "NumberOf8BitChannels",
+                                                               # "Position",
+                                                               # "Name",
+                                                               # "Comment",
+                                                               # "TimeInformation",
+                                                               # "EventInformation"])
 
 class PacketDecoder():
     STX = b'\x02'
@@ -75,16 +74,48 @@ class DatagramReader():
         return data
 
     def read_next_datagram(self):
-        if not self._gen:
-            self._gen = self._decoder.get_datagram()
+        datagram = None
+        while datagram is None:
+            if not self._gen:
+                self._gen = self._decoder.get_datagram()
 
-        datagram = next(self._gen, None)
-        if datagram == None:
-            self._gen = None
+            datagram = next(self._gen, None)
+            if datagram == None:
+                self._gen = None
+                self.receive()
 
-        self.last_datagram = datagram
         return datagram
 
-    def decode_datagram(self, datagram):
-        fmt = '3s11s2HI4H2I5H2I2H5s2fI9H'
-        sick561_datagram._make(unpack(fmt, datagram))
+    @staticmethod
+    def parse_number(nbr_str):
+        """ decimal numbers are encoded with leading +/- """
+        if b'+' in nbr_str or b'-' in nbr_str:
+            return int(nbr_str)
+        else:
+            return int(nbr_str, 16)
+
+    @staticmethod
+    def decode_datagram(datagram):
+        items = datagram.split(b' ')
+        debug(items)
+        debug(len(items))
+
+        parse_number = DatagramReader.parse_number
+
+        header = {}
+        header['TypeOfCommand'] = items[0].decode('ascii')
+        header['Command'] = items[1].decode('ascii')
+        header['VersionNumber'] = parse_number(items[2])
+        header['DeviceNumber'] = parse_number(items[3])
+        header['SerialNumber'] = items[4].decode('ascii')
+        header['DeviceSatus'] = parse_number(items[5])
+        header['TelegramCounter'] = parse_number(items[6])
+        header['TimeSinceStartup'] = parse_number(items[7])
+        header['TimeOfTransmission'] = parse_number(items[8])
+        header['AngularStepWidth'] = parse_number(items[24])
+        header['NumberOfData'] = parse_number(items[25])
+
+        return header
+
+        # fmt = '3s11s2HI4H2I5H2I2H5s2fI2H'
+        # return Sick561Datagram._make(unpack(fmt, datagram[0:88]))
