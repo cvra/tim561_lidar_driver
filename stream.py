@@ -10,7 +10,6 @@ datagram_reader = DatagramReader(s)
 
 while 1:
     datagram_reader.receive()
-    datagram = datagram_reader.readNextDatagram()
-
-    print(readNextDatagram + "\n\n")
+    datagram = datagram_reader.read_next_datagram()
+    print(datagram)
 
