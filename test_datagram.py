@@ -27,8 +27,7 @@ class TestPacketDecoder(unittest.TestCase):
         sample = b'\x00'+ETX+b'\x00'+STX+b'\x04'+ETX+b'\x05'+STX+b'\x06'+ETX+b'\x07'+STX+b'\x00'
 
         mock_socket = mock.Mock()
-        attrs = {'recv.return_value': sample}
-        mock_socket.configure_mock(**attrs)
+        mock_socket.recv.return_value = sample
 
         datagram_reader = DatagramReader(mock_socket)
         data = datagram_reader.receive()
@@ -41,8 +40,7 @@ class TestPacketDecoder(unittest.TestCase):
         out3 = STX+b'\x00'+b'\x00'+ETX
 
         mock_socket = mock.Mock()
-        attrs = {'recv.return_value': sample}
-        mock_socket.configure_mock(**attrs)
+        mock_socket.recv.return_value = sample
 
         datagram_reader = DatagramReader(mock_socket)
         datagram_reader.receive()
@@ -60,6 +58,43 @@ class TestPacketDecoder(unittest.TestCase):
         datagram = datagram_reader.readNextDatagram()
         self.assertEqual(datagram, out3)
 
+
+class TestDatagramReader(unittest.TestCase):
+
+    def test_receive(self):
+        sample = b'\x00'+ETX+b'\x00'+STX+b'\x04'+ETX+b'\x05'+STX+b'\x06'+ETX+b'\x07'+STX+b'\x00'
+
+        mock_socket = mock.Mock()
+        mock_socket.recv.return_value = sample
+
+        datagram_reader = DatagramReader(mock_socket)
+        data = datagram_reader.receive()
+        self.assertEqual(data, sample)
+
+    def test_receive_next(self):
+        sample = b'\x00'+ETX+b'\x00'+STX+b'\x04'+ETX+b'\x05'+STX+b'\x06'+ETX+b'\x07'+STX+b'\x00'
+        out1 = STX+b'\x04'+ETX
+        out2 = STX+b'\x06'+ETX
+        out3 = STX+b'\x00'+b'\x00'+ETX
+
+        mock_socket = mock.Mock()
+        mock_socket.recv.return_value = sample
+
+        datagram_reader = DatagramReader(mock_socket)
+        datagram_reader.receive()
+
+        datagram = datagram_reader.readNextDatagram()
+        self.assertEqual(datagram, out1)
+
+        datagram = datagram_reader.readNextDatagram()
+        self.assertEqual(datagram, out2)
+
+        datagram = datagram_reader.readNextDatagram()
+        self.assertEqual(datagram, None)
+
+        datagram_reader.receive()
+        datagram = datagram_reader.readNextDatagram()
+        self.assertEqual(datagram, out3)
 
 
 
