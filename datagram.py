@@ -45,7 +45,7 @@ class PacketDecoder():
     def feed(self, buffer):
         self._stream += buffer
 
-    def getDatagram(self):
+    def get_datagram(self):
         '''
         Yields packets from the current stream.
         '''
@@ -74,9 +74,9 @@ class DatagramReader():
         self._decoder.feed(data)
         return data
 
-    def readNextDatagram(self):
+    def read_next_datagram(self):
         if not self._gen:
-            self._gen = self._decoder.getDatagram()
+            self._gen = self._decoder.get_datagram()
 
         datagram = next(self._gen, None)
         if datagram == None:
@@ -85,9 +85,6 @@ class DatagramReader():
         self.last_datagram = datagram
         return datagram
 
-    def decodeDatagram(self, datagram=None):
-        if not datagram:
-            datagram = last_datagram
-
+    def decode_datagram(self, datagram):
         fmt = '3s11s2HI4H2I5H2I2H5s2fI9H'
         sick561_datagram._make(unpack(fmt, datagram))

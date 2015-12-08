@@ -19,7 +19,7 @@ class TestPacketDecoder(unittest.TestCase):
         out2 = STX+b'\x06'+ETX
 
         packet_decoder.feed(sample)
-        gen = packet_decoder.getDatagram()
+        gen = packet_decoder.get_datagram()
         self.assertEqual(next(gen), out1)
         self.assertEqual(next(gen), out2)
 
@@ -45,17 +45,17 @@ class TestPacketDecoder(unittest.TestCase):
         datagram_reader = DatagramReader(mock_socket)
         datagram_reader.receive()
 
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, out1)
 
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, out2)
 
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, None)
 
         datagram_reader.receive()
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, out3)
 
 
@@ -83,18 +83,21 @@ class TestDatagramReader(unittest.TestCase):
         datagram_reader = DatagramReader(mock_socket)
         datagram_reader.receive()
 
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, out1)
 
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, out2)
 
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, None)
 
         datagram_reader.receive()
-        datagram = datagram_reader.readNextDatagram()
+        datagram = datagram_reader.read_next_datagram()
         self.assertEqual(datagram, out3)
+
+    def test_decode(self):
+        pass
 
 
 
