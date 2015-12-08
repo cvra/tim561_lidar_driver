@@ -84,6 +84,8 @@ class DatagramReader():
                 self._gen = None
                 self.receive()
 
+        datagram = datagram.lstrip(PacketDecoder.STX)
+        datagram = datagram.rstrip(PacketDecoder.ETX)
         return datagram
 
     @staticmethod
