@@ -99,21 +99,28 @@ class DatagramReader():
     @staticmethod
     def decode_datagram(datagram):
         items = datagram.split(b' ')
-        debug(items)
-        debug(len(items))
+        # debug(items)
+        # debug(len(items))
 
         parse_number = DatagramReader.parse_number
 
         header = {}
         header['TypeOfCommand'] = items[0].decode('ascii')
+        if header['TypeOfCommand'] != 'sSN':
+            return None
         header['Command'] = items[1].decode('ascii')
+        if header['Command'] != 'LMDscandata':
+            return None
         header['VersionNumber'] = parse_number(items[2])
         header['DeviceNumber'] = parse_number(items[3])
         header['SerialNumber'] = items[4].decode('ascii')
-        header['DeviceSatus'] = parse_number(items[5])
-        header['TelegramCounter'] = parse_number(items[6])
-        header['TimeSinceStartup'] = parse_number(items[7])
-        header['TimeOfTransmission'] = parse_number(items[8])
+        header['DeviceSatus1'] = parse_number(items[5])
+        header['DeviceSatus2'] = parse_number(items[6])
+        if header['DeviceSatus1'] != 0 or header['DeviceSatus2'] != 0:
+            return None
+        header['TelegramCounter'] = parse_number(items[7])
+        header['TimeSinceStartup'] = parse_number(items[9])
+        header['TimeOfTransmission'] = parse_number(items[10])
         header['AngularStepWidth'] = parse_number(items[24])
         header['NumberOfData'] = parse_number(items[25])
 
