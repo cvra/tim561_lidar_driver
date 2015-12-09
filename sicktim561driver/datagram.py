@@ -88,7 +88,7 @@ def decode_datagram(datagram):
     header['TimeOfTransmission'] = parse_number(items[10])
     header['AngularStepWidth'] = parse_number(items[24])
     header['NumberOfData'] = parse_number(items[25])
-    header['Data'] = [parse_number(x) for x in items[26:26+header['NumberOfData']]]
+    header['Data'] = [parse_number(x) / 1000 for x in items[26:26+header['NumberOfData']]]
 
     return header
 
