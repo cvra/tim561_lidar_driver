@@ -1,15 +1,21 @@
 import socket
-from datagram import DatagramReader
+from datagram import *
+import zmqmsgbus
+
+bus = zmqmsgbus.Bus(sub_addr='ipc://ipc/source',
+                    pub_addr='ipc://ipc/sink')
+
+node = zmqmsgbus.Node(bus)
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(("192.168.0.1", 2112))
 # activate stream
 s.send(b'\x02sEN LMDscandata 1\x03\0')
 
-datagram_reader = DatagramReader(s)
+datagrams_generator = datagrams_from_socket(s)
 
 while 1:
-    datagram_reader.receive()
-    datagram = datagram_reader.read_next_datagram()
-    print(datagram)
+    datagram = next(datagrams_generator)
+    decoded = decode_datagram(datagram)
 
+    node.publish('/lidar/scan', decoded)

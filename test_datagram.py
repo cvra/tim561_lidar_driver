@@ -34,7 +34,6 @@ class TestDatagramReader(unittest.TestCase):
 
     def test_decode(self):
         decoded = decode_datagram(TestDatagramReader.example_frame)
-        debug(decoded)
 
         expected = {'TypeOfCommand': 'sSN',
                     'Command': 'LMDscandata',
@@ -48,7 +47,9 @@ class TestDatagramReader(unittest.TestCase):
                     'NumberOfData': 811,
                     'TimeSinceStartup': 195076021,
                     'TimeOfTransmission': 195080325}
-        self.assertEqual(expected, decoded)
+
+        self.assertEqual(expected, {key:decoded[key] for key,value in expected.items()})
+
 
 
 if __name__ == '__main__':
