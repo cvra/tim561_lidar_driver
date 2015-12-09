@@ -1,5 +1,5 @@
 import unittest
-from datagram import *
+from sicktim561driver import *
 import unittest.mock as mock
 from logging import debug
 from itertools import *
