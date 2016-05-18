@@ -10,7 +10,7 @@ if __name__ == '__main__':
     node = zmqmsgbus.Node(bus)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("192.168.0.1", 2112))
+    s.connect(("10.0.10.3", 2112))
     # activate stream
     s.send(b'\x02sEN LMDscandata 1\x03\0')
 
