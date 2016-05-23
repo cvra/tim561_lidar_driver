@@ -1,7 +1,10 @@
 import socket
 from sicktim561driver import *
 import zmqmsgbus
+import numpy as np
 
+TIM561_START_ANGLE = 2.3561944902   # -135° in rad
+TIM561_STOP_ANGLE = -2.3561944902   #  135° in rad
 
 if __name__ == '__main__':
     bus = zmqmsgbus.Bus(sub_addr='ipc://ipc/source',
@@ -19,5 +22,7 @@ if __name__ == '__main__':
     while 1:
         datagram = next(datagrams_generator)
         decoded = decode_datagram(datagram)
-
-        node.publish('/lidar/scan', decoded)
+        
+        if decoded is not None:
+            node.publish('/lidar/radius', decoded['Data'])
+            node.publish('/lidar/theta', np.linspace(TIM561_START_ANGLE, TIM561_STOP_ANGLE, len(decoded['Data'])).tolist())
